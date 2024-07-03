@@ -1,5 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
+require("dotenv").config();
+
 const User = require("./models/user.model");
 const Movies = require("./models/movies.model");
 const movieRoutes = require("./routes/movies.route");
@@ -41,9 +43,7 @@ app.listen(port, () => {
 });
 
 mongoose
-  .connect(
-    "mongodb+srv://robertcalderon:bdpassword123@cluster0.mb3muye.mongodb.net/sample_mflix?retryWrites=true&w=majority&appName=Cluster0"
-  )
+  .connect(process.env.MONGO_STRING)
   .then(() => {
     console.log("Mongo is connected");
   })
