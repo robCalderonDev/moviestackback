@@ -14,6 +14,10 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/api/movies", movieRoutes);
 
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
 app.get("/api/user", async (req, res) => {
   try {
     const users = await User.find({});
