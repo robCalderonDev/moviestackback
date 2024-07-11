@@ -1,11 +1,22 @@
 const Movies = require("../models/movies.model");
-
+const jsonwebtoken = require("jsonwebtoken");
+require("dotenv").config();
 const getMovies = async (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) {
+    return res.status(403).json({ message: "Unauthorized" });
+  }
+  //verifica si el token es correcto
+
   try {
     const movies = await Movies.find({}).limit(10);
-    res.status(200).json(movies);
+    const data = jsonwebtoken.verify(token, process.env.JWT_SECRET);
+    if (!data) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+    res.status(200).json({ movies });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error });
   }
 };
 

@@ -1,17 +1,17 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-require("dotenv").config();
 
+require("dotenv").config();
+const cookieParser = require("cookie-parser");
 const movieRoutes = require("./routes/movies.route");
 const userRouter = require("./routes/user.route");
 const app = express();
 const port = 3000;
 //middlewares
 app.use(express.json());
+app.use(cookieParser());
 
 app.use(express.urlencoded({ extended: false }));
-
 app.use("/api/movies", movieRoutes);
 app.use("/api/user", userRouter);
 

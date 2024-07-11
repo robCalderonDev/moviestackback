@@ -1,5 +1,8 @@
 const User = require("../models/user.model");
+const jsonwebtoken = require("jsonwebtoken");
+require("dotenv").config();
 const bcrypt = require("bcrypt");
+
 const getUser = async (req, res) => {
   try {
     const users = await User.find({});
@@ -40,7 +43,10 @@ const postUser = async (req, res) => {
 };
 const Login = async (req, res) => {
   const { email, password } = req.body;
+
   const user = await User.findOne({ email: email });
+  Validation.email(email, res);
+  Validation.password(password, res);
   if (!user) {
     return res.status(400).json({ error: "User not found" });
   }
@@ -48,7 +54,26 @@ const Login = async (req, res) => {
   if (!isPasswordValid) {
     return res.status(400).json({ error: "Invalid password" });
   }
-  res.status(200).json({ message: "Login successful", user });
+  const publicUser = {
+    name: user.name,
+    email: user.email,
+    id: user._id,
+  };
+  const token = jsonwebtoken.sign(
+    { id: user._id, email: email, name: user.name },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "1h",
+    }
+  );
+  return res
+    .cookie("access_token", token, {
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: 1000 * 60 * 60, //cookie tiene validez de 1 hora
+    })
+    .status(200)
+    .json({ message: "Login successful", publicUser, token });
 };
 
 //validaciones
